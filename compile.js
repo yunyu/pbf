@@ -147,7 +147,7 @@ function writeMessage(ctx, options) {
         code += ctx._indent + '    ' + compileFunctionHead(options, 'read', 'pbf, end', 'pbf: Pbf, end?: number', getTypescriptInterfaceName(ctx)) + ' {\n';
         code += ctx._indent + '        return pbf.readFields(' + ctx._fullName + '._readField, ' + compileDest(ctx) + ', end);\n';
         code += ctx._indent + '    },\n';
-        code += ctx._indent + '    ' + compileFunctionHead(options, '_readField', 'tag, obj, pbf', 'tag: number, obj: any, pbf: Pbf', 'void') + ' {\n';
+        code += ctx._indent + '    ' + compileFunctionHead(options, '_readField', 'tag, obj, pbf', 'tag: number, obj: any, pbf?: Pbf', 'void') + ' {\n';
 
         var hasVarEntry = false;
         for (var i = 0; i < fields.length; i++) {
@@ -163,7 +163,7 @@ function writeMessage(ctx, options) {
                 hasVarEntry = true;
             }
             code += ctx._indent + '        ' + (i ? 'else if' : 'if') +
-                ' (tag === ' + field.tag + ') ' +
+                ' (tag === ' + field.tag + ' && pbf) ' +
                 (field.type === 'map' ? ' { ' : '') +
                 (
                     field.type === 'map' ? compileMapRead(readCode, field.name) :
@@ -184,7 +184,7 @@ function writeMessage(ctx, options) {
     }
 
     if (!options.noWrite) {
-        code += ctx._indent + '    ' + compileFunctionHead(options, 'write', 'obj, pbf', 'obj: ' + getTypescriptInterfaceName(ctx) + ', pbf: Pbf', 'void') + ' {\n';
+        code += ctx._indent + '    ' + compileFunctionHead(options, 'write', 'obj, pbf', 'obj: ' + getTypescriptInterfaceName(ctx) + ', pbf?: Pbf', 'void') + ' {\n';
         var numRepeated = 0;
         for (i = 0; i < fields.length; i++) {
             field = fields[i];
@@ -556,7 +556,7 @@ function getDefaultWriteTest(ctx, field) {
         }
     }
 
-    return code + ') ';
+    return code + ' && pbf) ';
 }
 
 function isPacked(field) {
