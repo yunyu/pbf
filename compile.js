@@ -49,7 +49,7 @@ function writeTypes(ctx, options) {
             var oneOfName = field.oneof;
             if (oneOfName && !isOneOfAdded[oneOfName]) {
                 var oneOfValues = getOneOfValues(fields, oneOfName);
-                code += '    ' + oneOfName + ': ' + oneOfValues.map(value => JSON.stringify(value)).join(' | ') + ';\n';
+                code += '    ' + oneOfName + '?: ' + oneOfValues.map(value => JSON.stringify(value)).join(' | ') + ';\n';
                 isOneOfAdded[oneOfName] = true;
             }
 
@@ -225,7 +225,7 @@ function compileDest(ctx) {
     for (var i = 0; i < ctx._proto.fields.length; i++) {
         var field = ctx._proto.fields[i];
         props[field.name + ': ' + JSON.stringify(ctx._defaults[field.name])] = true;
-        if (field.oneof) props[field.oneof + ': null'] = true;
+        if (field.oneof) props[field.oneof + ': undefined'] = true;
     }
     return '{' + Object.keys(props).join(', ') + '}';
 }
@@ -422,7 +422,7 @@ function getDefaultValue(field, value) {
     case 'string':   return value || '';
     case 'bool':     return value === 'true';
     case 'map':      return {};
-    default:         return null;
+    default:         return undefined;
     }
 }
 
